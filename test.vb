@@ -1,10 +1,7 @@
 Sub RunSELECT()
-    Dim cn As Object, rs As Object, output As String, SQL As String
-    'Dim UseCase
-    
-    'UseCase = InputBox("Input use case no.", "Use Case#", "1")
-    SQL = InputBox("Input SQL select statement", "SQL query", "")
-    'output = "[Test Case ID] ; [Scenario] ; [EBJ Item#] ; [Tester]" & vbNewLine
+    Dim cn As Object, rs As Object, output As String, sql As String
+    Dim UseCase
+    UseCase = InputBox("Input use case no.", "Use Case#", "1")
     
     '---Connecting to the Data Source---
     Set cn = CreateObject("ADODB.Connection")
@@ -16,16 +13,19 @@ Sub RunSELECT()
     
     
     '---Run the SQL SELECT Query---
-    'SQL = "SELECT [Test Case ID], [Scenario], [EBJ Item#], [Tester] FROM [Sheet1$] WHERE [General Scenario] = 'Item Creation' and [Test Case ID] like '" & UseCase & "%';"
-    Set rs = cn.Execute(SQL)
+    sql = "SELECT [Test Case ID], [Scenario], [EBJ Item#] FROM [Sheet1$] WHERE [General Scenario] = 'Item Creation' and [Use Case] = '" & UseCase & "';"
+    Set rs = cn.Execute(sql)
     
     Do
-       output = output & rs(0) & " ; " & rs(1) & " ; " & rs(2) & " ; " & rs(3) & " ; " & rs(4) & vbNewLine
-       Debug.Print rs(0); " ; " & rs(1) & " ; " & rs(2) & " ; " & rs(3) & " ; " & rs(4)
+       'output = output & rs(0) & " ; " & rs(1) & " ; " & rs(2) & vbNewLine
+       output = rs(0) & " ; " & rs(1) & " ; " & rs(2)
+       UserForm1.ListBox1.AddItem output
+       
+       Debug.Print rs(0); " ; " & rs(1) & " ; " & rs(2)
        rs.Movenext
     Loop Until rs.EOF
+    'MsgBox output
     
-    UserForm1.TextBox1.Text = output
     UserForm1.Show
     
     '---Clean up---

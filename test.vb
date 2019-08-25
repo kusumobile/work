@@ -17,11 +17,13 @@ Sub RunSELECT()
     Set rs = cn.Execute(sql)
     
     Do
-       output = output & rs(0) & " ; " & rs(1) & " ; " & rs(2) & vbNewLine
+       output = output & rs(0) & " ; " & rs(1) & " ; " & rs(2) & vbCrLf
        Debug.Print rs(0); " ; " & rs(1) & " ; " & rs(2)
        rs.Movenext
     Loop Until rs.EOF
-    MsgBox output
+    
+    UserForm1.TextBox1.Text = output
+    UserForm1.Show
     
     '---Clean up---
     rs.Close

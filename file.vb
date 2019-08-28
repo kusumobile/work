@@ -1,8 +1,8 @@
 Sub ListAllFilesInAllFolders()
  
-    Dim MyPath As String, MyFolderName As String, MyFileName As String
+    Dim MyPath As String, MyFolderName As String, MyFileName As String, DateStamp As Date
     Dim i As Integer, F As Boolean
-    Dim objShell As Object, objFolder As Object, AllFolders As Object, AllFiles As Object
+    Dim objShell As Object, objFolder As Object, AllFolders As Object, AllFilesPath As Object, AllFilesName As Object, AllFilesDate As Object
     Dim MySheet As Worksheet
      
     On Error Resume Next
@@ -24,7 +24,9 @@ Sub ListAllFilesInAllFolders()
     'List all folders
      
     Set AllFolders = CreateObject("Scripting.Dictionary")
-    Set AllFiles = CreateObject("Scripting.Dictionary")
+    Set AllFilesPath = CreateObject("Scripting.Dictionary")
+    Set AllFilesName = CreateObject("Scripting.Dictionary")
+    Set AllFilesDate = CreateObject("Scripting.Dictionary")
     AllFolders.Add (MyPath), ""
     i = 0
     Do While i < AllFolders.Count
@@ -46,7 +48,10 @@ Sub ListAllFilesInAllFolders()
         MyFileName = Dir(Key & "*.*")
         'MyFileName = Dir(Key & "*.PDF")    'only PDF files
         Do While MyFileName <> ""
-            AllFiles.Add (Key & MyFileName), ""
+            DateStamp = FileDateTime(Key & MyFileName)
+            AllFilesPath.Add (Key), ""
+            AllFilesName.Add (MyFileName), ""
+            AllFilesDate.Add (DateStamp), ""
             MyFileName = Dir
         Loop
     Next
@@ -66,21 +71,11 @@ Sub ListAllFilesInAllFolders()
     If Not F Then Sheets.Add.Name = "Files"
  
     'Sheets("Files").[A1].Resize(AllFolders.Count, 1) = WorksheetFunction.Transpose(AllFolders.keys)
-    Sheets("Files").[A1].Resize(AllFiles.Count, 1) = WorksheetFunction.Transpose(AllFiles.keys)
+    Sheets("Files").[A1].Resize(AllFilesPath.Count, 1) = WorksheetFunction.Transpose(AllFilesPath.keys)
+    Sheets("Files").[B1].Resize(AllFilesName.Count, 1) = WorksheetFunction.Transpose(AllFilesName.keys)
+    Sheets("Files").[C1].Resize(AllFilesDate.Count, 1) = WorksheetFunction.Transpose(AllFilesDate.keys)
     Set AllFolders = Nothing
-    Set AllFiles = Nothing
+    Set AllFilesPath = Nothing
+    Set AllFilesName = Nothing
+    Set AllFilesDate = Nothing
 End Sub
-
-'Get File Date
-Do While MyFileName <> ""
-    DateStamp = FileDateTime(key & MyFileName)
-    AllFiles.Add (key & MyFileName), DateStamp
-    MyFileName = Dir
-Loop
-
-'Get File Size
-Do While MyFileName <> ""
-    MyFileSize = FileLen(Key & MyFileName)
-    AllFiles.Add (MyFileName), MyFileSize
-    MyFileName = Dir
-Loop

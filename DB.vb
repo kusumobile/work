@@ -11,7 +11,7 @@ Private Sub ExcelConnectDB()
       "Data Source=" & ThisWorkbook.Path & "\" & ThisWorkbook.Name & ";" & "Extended Properties=""Excel 12.0 Xml;HDR=YES"";"  'このExcelブックを指定してコネクションを開く
 End Sub
 
-Private Sub AcessConnectDB()
+Private Sub AccessConnectDB()
   '## Access接続
   Set AccessCn = CreateObject("ADODB.Connection") 'ADOコネクションを作成
   AccessCn.Open "Provider=Microsoft.ACE.OLEDB.12.0;" & _
@@ -38,17 +38,17 @@ Private Sub AccessDisconnectDB()
   
 End Sub
 
-Public Sub putRsOnSheet(ByVal AcessSql As String, ByVal ws As Worksheet, ByVal rng As Range)
+Public Sub putRsOnSheet(ByVal AccessSql As String, ByVal ws As Worksheet, ByVal rng As Range)
   '## レコードセットをシートへ展開
 
   On Error GoTo Err_Handler  'エラーが起きたら「ErrorHandler」にジャンプする指示
 
-  Call AcessConnectDB  '接続
+  Call AccessConnectDB  '接続
 
   'レコードセットのオープン
   Dim rs As Object  'レコードセット用変数宣言
   Set rs = CreateObject("ADODB.RecordSet")  'ADOレコードセットオブジェクトを作成
-  rs.Open AcessSql, AccessCn, ExcelCn  'レコードセットを開く
+  rs.Open AccessSql, AccessCn, ExcelCn  'レコードセットを開く
 
   '空だったら最終処理へ
   If rs Is Nothing Or (rs.BOF And rs.EOF) Then  'レコードセットやレコードが存在しなかった場合
@@ -93,15 +93,15 @@ Public Function tryExecute(ByVal sqlList As Collection) As Boolean
 
   On Error GoTo ErrorHandler  'エラーが起きたら「ErrorHandler」にジャンプする指示
 
-  Call AcessConnectDB  '接続
+  Call AccessConnectDB  '接続
 
   AccessCn.BeginTrans  'トランザクション開始
 
   '実行
-  Dim AcessSql As Variant
-  For Each AcessSql In sqlList  'SQL文リストをループ
-    AccessCn.Execute AcessSql  '1行ずつ実行
-  Next AcessSql
+  Dim AccessSql As Variant
+  For Each AccessSql In sqlList  'SQL文リストをループ
+    AccessCn.Execute AccessSql  '1行ずつ実行
+  Next AccessSql
 
   AccessCn.CommitTrans  '確定
 
@@ -127,9 +127,9 @@ Public Sub loadRecord()
   Set ws = Sheets("RESULT")
 
   'SQL文の作成
-  Dim AcessSql As String
-  AcessSql = "SELECT * FROM KOEI_DWM_RULE WHERE JAPANESE IN (" & ExcelCn.Execute(SELECT [TransText] FROM [Sheet1$];) & ");"
+  Dim AccessSql As String
+  AccessSql = "SELECT * FROM KOEI_DWM_RULE WHERE JAPANESE IN (" & ExcelCn.Execute(SELECT [TransText] FROM [Sheet1$];) & ");"
 
   'レコードセットをシートへ展開
-  Call putRsOnSheet(AcessSql, ws, ws.Range("A1"))
+  Call putRsOnSheet(AccessSql, ws, ws.Range("A1"))
 End Sub
